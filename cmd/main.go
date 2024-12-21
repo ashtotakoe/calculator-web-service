@@ -6,15 +6,15 @@ import (
 )
 
 func main() {
-
 	// expression := os.Args[1]
-	res, err := calculator.Calc("((1+4) * (1+2) +10) *4")
-
 	// res, err := Calc(expression)
+
+	// res, err := calculator.Calc("((1+4) * (1+2) +10) *4")
+	res, err := calculator.Calc("-90 + 90")
+
 	if err != nil {
-		fmt.Println(err.Error())
-	} else {
-		fmt.Println(int(res))
+		panic(err)
 	}
+	fmt.Println(int(res))
 
 }

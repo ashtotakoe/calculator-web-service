@@ -81,18 +81,74 @@ func tokenize(expression string) ([]Token, error) {
 }
 
 func evaluateExpression(expression []Token) (Token, error) {
+	err := openExpressionBrackets(&expression)
 
+	if err != nil {
+		return newEmptyToken(), err
+	}
+
+	for i := len(expression) - 1; i >= 0; i-- {
+		token := expression[i]
+
+		if token.textValue != "+" && token.textValue != "-" {
+			continue
+		}
+
+		// check if there is a number after the operator, but not before to handle (+90) or (-5) correctly
+		if i >= len(expression)-1 || expression[i+1].tokenType != "number" {
+			continue
+		}
+
+		// we shall the situations like (1 + 2) for now
+		if i != 0 && expression[i-1].tokenType == "number" {
+			continue
+		}
+
+		if token.textValue == "-" {
+			expression[i+1].numberValue = -expression[i+1].numberValue
+		}
+
+		expression[i] = newEmptyToken()
+
+	}
+
+	expression = cleanExpression(expression)
+
+	err = scanForMathOperators(&expression, func(expression []Token) bool {
+		return containsTokensValue(expression, "*") || containsTokensValue(expression, "/")
+	})
+
+	if err != nil {
+		return newEmptyToken(), err
+	}
+
+	err = scanForMathOperators(&expression, func(expression []Token) bool {
+		return containsTokensValue(expression, "+") || containsTokensValue(expression, "-")
+	})
+
+	if err != nil {
+		return newEmptyToken(), err
+	}
+
+	if len(expression) == 1 {
+		return expression[0], nil
+	}
+
+	return newEmptyToken(), errors.New("something is wrong with expression")
+}
+
+func openExpressionBrackets(expression *[]Token) error {
 	stackLen := 0
 	entryIndex := 0
 	isOpeningBracketFound := false
 
-	for index, token := range expression {
+	for index, token := range *expression {
 		if token.tokenType != "operator" {
 			continue
 		}
 
 		if token.textValue == ")" && !isOpeningBracketFound {
-			return newEmptyToken(), errors.New("bracket is not closed")
+			return errors.New("bracket is not closed")
 		}
 
 		if token.textValue == "(" && !isOpeningBracketFound {
@@ -110,104 +166,69 @@ func evaluateExpression(expression []Token) (Token, error) {
 		if token.textValue == ")" {
 			stackLen -= 1
 			if stackLen < 0 {
-				return newEmptyToken(), errors.New("too many closing brackets")
+				return errors.New("too many closing brackets")
 			}
 
 			if stackLen == 0 {
-				// clear()
-
 				expressionSlice := make([]Token, index-entryIndex-1)
-				copy(expressionSlice, expression[entryIndex+1:index])
+				copy(expressionSlice, (*expression)[entryIndex+1:index])
 
 				expressionCompute, err := evaluateExpression(expressionSlice)
 
 				if err != nil {
-					return newEmptyToken(), err
+					return err
 				}
 
-				eraseFromSlice(expression[entryIndex : index+1])
-				expression[index] = expressionCompute
+				eraseFromSlice((*expression)[entryIndex : index+1])
+				(*expression)[index] = expressionCompute
 
 				isOpeningBracketFound = false
 			}
 		}
 	}
 
-	expression = cleanExpression(expression)
+	*expression = cleanExpression(*expression)
 
-	for containsTokensValue(expression, "*") || containsTokensValue(expression, "/") {
-		// clear()
-		for index, token := range expression {
-			if token.textValue != "*" && token.textValue != "/" {
+	return nil
+
+}
+
+func scanForMathOperators(expression *[]Token, operatorsCheckFunc func(expression []Token) bool) error {
+	for operatorsCheckFunc(*expression) {
+
+		for index, token := range *expression {
+			if !operatorsCheckFunc([]Token{token}) {
 				continue
 			}
 
-			operator := expression[index]
+			operator := (*expression)[index]
 
-			if (index-1) < 0 || (index+1) >= len(expression) {
-				return newEmptyToken(), fmt.Errorf("operator %v is not in the correct position", expression[index].textValue)
+			if (index-1) < 0 || (index+1) >= len(*expression) {
+				return fmt.Errorf("operator %v is not in the correct position", (*expression)[index].textValue)
 			}
 
-			operand1, operand2 := expression[index-1], expression[index+1]
+			operand1, operand2 := (*expression)[index-1], (*expression)[index+1]
 
 			if operand1.tokenType != "number" || operand2.tokenType != "number" || operator.tokenType != "operator" {
-				return newEmptyToken(), fmt.Errorf("something is wrong with expression %s %s %s", operand1.textValue, operator.textValue, operand2.textValue)
+				return fmt.Errorf("something is wrong with expression %s %s %s", operand1.textValue, operator.textValue, operand2.textValue)
 			}
 
 			result, err := conductArithmeticOperation(operand1.numberValue, operand2.numberValue, operator.textValue)
 			if err != nil {
-				return newEmptyToken(), err
+				return err
 			}
 
-			expression[index-1] = newEmptyToken()
-			expression[index+1] = newEmptyToken()
-			expression[index] = result
+			(*expression)[index-1] = newEmptyToken()
+			(*expression)[index+1] = newEmptyToken()
+			(*expression)[index] = result
 
 			break
 		}
 
-		expression = cleanExpression(expression)
+		*expression = cleanExpression(*expression)
 	}
 
-	for containsTokensValue(expression, "+") || containsTokensValue(expression, "-") {
-
-		for index, token := range expression {
-			if token.textValue != "+" && token.textValue != "-" {
-				continue
-			}
-
-			operator := expression[index]
-
-			if (index-1) < 0 || (index+1) >= len(expression) {
-				return newEmptyToken(), fmt.Errorf("operator %v is not in the correct position", expression[index].textValue)
-			}
-
-			operand1, operand2 := expression[index-1], expression[index+1]
-
-			if operand1.tokenType != "number" || operand2.tokenType != "number" || operator.tokenType != "operator" {
-				return newEmptyToken(), fmt.Errorf("something is wrong with expression %s %s %s", operand1.textValue, operator.textValue, operand2.textValue)
-			}
-
-			result, err := conductArithmeticOperation(operand1.numberValue, operand2.numberValue, operator.textValue)
-			if err != nil {
-				return newEmptyToken(), err
-			}
-
-			expression[index-1] = newEmptyToken()
-			expression[index+1] = newEmptyToken()
-			expression[index] = result
-
-			break
-		}
-
-		expression = cleanExpression(expression)
-	}
-
-	if len(expression) == 1 {
-		return expression[0], nil
-	}
-
-	return newEmptyToken(), errors.New("too many elements are left in expression")
+	return nil
 }
 
 func Calc(expression string) (float64, error) {
