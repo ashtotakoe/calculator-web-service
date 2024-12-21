@@ -1,4 +1,4 @@
-package main
+package calculator
 
 import "errors"
 
@@ -19,11 +19,4 @@ var operations = map[string]func(float64, float64) (float64, error){
 		}
 		return a / b, nil
 	},
-}
-
-var arithmeticErrors = map[string]string{
-	"-": "failed to parse values while substracting",
-	"+": "failed to parse values while adding",
-	"*": "failed to parse values while multiplying",
-	"/": "failed to parse values while deviding",
 }
