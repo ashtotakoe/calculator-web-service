@@ -67,8 +67,7 @@ func eraseFromSlice(slice []Token) []Token {
 }
 
 func printArr(arr []Token) {
-	fmt.Println()
-	fmt.Println()
+	fmt.Print("\n\n")
 
 	for _, token := range arr {
 		display := token.textValue
@@ -79,12 +78,15 @@ func printArr(arr []Token) {
 
 		fmt.Print("  ", display, "  ")
 	}
-	fmt.Println()
-	fmt.Println()
+
+	fmt.Print("\n\n")
+
 	for i := range arr {
+
 		fmt.Print("  ", i, "  ")
+
 	}
-	fmt.Println()
-	fmt.Println()
+
+	fmt.Print("\n\n")
 
 }
