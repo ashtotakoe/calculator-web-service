@@ -64,7 +64,7 @@ func tokenize(expression string) ([]Token, error) {
 		numberValue, err := strconv.ParseFloat(token, 64)
 
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse token %s: %s", token, err.Error())
+			return nil, fmt.Errorf("failed to parse token %q", token)
 
 		}
 
@@ -235,23 +235,25 @@ func scanForMathOperators(expression *[]Token, operatorsCheckFunc func(expressio
 	return nil
 }
 
-func Calc(expression string) (float64, error) {
+func Calc(expression string) (Result, error) {
 
 	formattedExpression := formatExpression(expression)
 
 	tokens, err := tokenize(formattedExpression)
 
 	if err != nil {
-		return 0, err
+		return Result{}, err
 	}
 
 	result, err := evaluateExpression(tokens)
 
 	if err != nil {
-		return 0, err
+		return Result{}, err
 	}
 
-	return result.numberValue, nil
+	return Result{
+		NumberValue: result.numberValue,
+		TextValue:   result.textValue}, nil
 }
 
 func conductArithmeticOperation(val1, val2 float64, operator string) (Token, error) {

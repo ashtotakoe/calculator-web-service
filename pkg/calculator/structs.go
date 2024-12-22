@@ -7,6 +7,11 @@ type Token struct {
 	numberValue    float64
 }
 
+type Result struct {
+	NumberValue float64
+	TextValue   string
+}
+
 func newEmptyToken() Token {
 	return Token{
 		tokenType: emptyTokenType,

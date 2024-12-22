@@ -1,18 +1,28 @@
 package main
 
 import (
-	"calculator/pkg/calculator"
-	"fmt"
+	"log"
+	"net/http"
 	"os"
+
+	"github.com/ashtotakoe/calculator-web-service/internal/server"
 )
 
 func main() {
-	expression := os.Args[1]
-	res, err := calculator.Calc(expression)
+	port := os.Args[1]
 
-	if err != nil {
-		panic(err)
+	runWithDetailedValidation := false
+
+	if len(os.Args) > 2 {
+		runWithDetailedValidation = os.Args[2] == "detailed-validation"
 	}
 
-	fmt.Println(res)
+	s := server.NewServer(runWithDetailedValidation)
+
+	log.Printf("Server is running on port %s \n detailed validation = %t\n", port, runWithDetailedValidation)
+	err := http.ListenAndServe(":"+port, s)
+	if err != nil {
+		log.Println(err)
+	}
+
 }

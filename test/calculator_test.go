@@ -1,8 +1,9 @@
-package calculator
+package test
 
 import (
-	"calculator/pkg/calculator"
 	"testing"
+
+	"github.com/ashtotakoe/calculator-web-service/pkg/calculator"
 )
 
 func TestCalc(t *testing.T) {
@@ -43,7 +44,7 @@ func TestCalc(t *testing.T) {
 				return
 			}
 
-			if result != testCase.expected {
+			if result.NumberValue != testCase.expected {
 				t.Errorf("Calc(%s) = %v, want %v", testCase.expression, result, testCase.expected)
 			}
 		})
