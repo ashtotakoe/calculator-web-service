@@ -57,7 +57,7 @@ curl --location 'http://localhost:[порт]/api/v1/calculate' \
 ```
 Также может прийти более детальная ошибка если сервер запущен с флагом **detailed-validation**
 
-### 3. Также может вернуться internal server error
+### 3. Также может вернуться internal server error в случае если сервер отработал некорректно
 
 Ответ (HTTP 500):
 
