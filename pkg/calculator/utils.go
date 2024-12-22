@@ -13,10 +13,10 @@ func clear() {
 	cmd.Run()
 }
 
-func cleanExpression(expression []Token) []Token {
-	res := make([]Token, 0, len(expression))
+func cleanExpression(expression *[]Token) []Token {
+	res := make([]Token, 0, len(*expression))
 
-	for _, token := range expression {
+	for _, token := range *expression {
 
 		if token.tokenType != emptyTokenType {
 			res = append(res, token)
@@ -41,8 +41,8 @@ func containsString(slice []string, item string) bool {
 	return false
 }
 
-func containsTokensValue(tokens []Token, value string) bool {
-	for _, token := range tokens {
+func containsTokensValue(tokens *[]Token, value string) bool {
+	for _, token := range *tokens {
 		if token.textValue == value {
 			return true
 		}

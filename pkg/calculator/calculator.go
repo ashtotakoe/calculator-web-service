@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func tokenize(expression string) ([]Token, error) {
+func tokenize(expression string) (*[]Token, error) {
 	operators := []string{"(", ")", "+", "-", "*", "/"}
 
 	parsedExpression := strings.Split(expression, "")
@@ -77,11 +77,11 @@ func tokenize(expression string) ([]Token, error) {
 
 	}
 
-	return parsedTokens, nil
+	return &parsedTokens, nil
 }
 
-func evaluateExpression(expression []Token) (Token, error) {
-	err := openExpressionBrackets(&expression)
+func evaluateExpression(expression *[]Token) (Token, error) {
+	err := openExpressionBrackets(expression)
 
 	if err != nil {
 		return newEmptyToken(), err
@@ -89,7 +89,7 @@ func evaluateExpression(expression []Token) (Token, error) {
 
 	expression = solveUnaryOperators(expression)
 
-	err = scanForMathOperators(&expression, func(expression []Token) bool {
+	err = scanForMathOperators(expression, func(expression *[]Token) bool {
 		return containsTokensValue(expression, "*") || containsTokensValue(expression, "/")
 	})
 
@@ -97,7 +97,7 @@ func evaluateExpression(expression []Token) (Token, error) {
 		return newEmptyToken(), err
 	}
 
-	err = scanForMathOperators(&expression, func(expression []Token) bool {
+	err = scanForMathOperators(expression, func(expression *[]Token) bool {
 		return containsTokensValue(expression, "+") || containsTokensValue(expression, "-")
 	})
 
@@ -105,40 +105,41 @@ func evaluateExpression(expression []Token) (Token, error) {
 		return newEmptyToken(), err
 	}
 
-	if len(expression) == 1 {
-		return expression[0], nil
+	if len(*expression) == 1 {
+		return (*expression)[0], nil
 	}
 
 	return newEmptyToken(), errors.New("something is wrong with expression")
 }
 
-func solveUnaryOperators(expression []Token) []Token {
-	for i := len(expression) - 1; i >= 0; i-- {
-		token := expression[i]
+func solveUnaryOperators(expression *[]Token) *[]Token {
+	for i := len(*expression) - 1; i >= 0; i-- {
+		token := (*expression)[i]
 
 		if token.textValue != "+" && token.textValue != "-" {
 			continue
 		}
 
 		// check if there is a number after the operator, but not before to handle (+90) or (-5) correctly
-		if i >= len(expression)-1 || expression[i+1].tokenType != "number" {
+		if i >= len(*expression)-1 || (*expression)[i+1].tokenType != "number" {
 			continue
 		}
 
 		// we shall skip the situations like (1 + 2) for now
-		if i != 0 && expression[i-1].tokenType == "number" {
+		if i != 0 && (*expression)[i-1].tokenType == "number" {
 			continue
 		}
 
 		if token.textValue == "-" {
-			expression[i+1].numberValue = -expression[i+1].numberValue
+			(*expression)[i+1].numberValue = -(*expression)[i+1].numberValue
 		}
 
-		expression[i] = newEmptyToken()
+		(*expression)[i] = newEmptyToken()
 
 	}
 
-	return cleanExpression(expression)
+	parsed := cleanExpression(expression)
+	return &parsed
 }
 
 func openExpressionBrackets(expression *[]Token) error {
@@ -177,7 +178,7 @@ func openExpressionBrackets(expression *[]Token) error {
 				expressionSlice := make([]Token, index-entryIndex-1)
 				copy(expressionSlice, (*expression)[entryIndex+1:index])
 
-				expressionCompute, err := evaluateExpression(expressionSlice)
+				expressionCompute, err := evaluateExpression(&expressionSlice)
 
 				if err != nil {
 					return err
@@ -191,17 +192,17 @@ func openExpressionBrackets(expression *[]Token) error {
 		}
 	}
 
-	*expression = cleanExpression(*expression)
+	*expression = cleanExpression(expression)
 
 	return nil
 
 }
 
-func scanForMathOperators(expression *[]Token, operatorsCheckFunc func(expression []Token) bool) error {
-	for operatorsCheckFunc(*expression) {
+func scanForMathOperators(expression *[]Token, operatorsCheckFunc func(expression *[]Token) bool) error {
+	for operatorsCheckFunc(expression) {
 
 		for index, token := range *expression {
-			if !operatorsCheckFunc([]Token{token}) {
+			if !operatorsCheckFunc(&[]Token{token}) {
 				continue
 			}
 
@@ -229,7 +230,7 @@ func scanForMathOperators(expression *[]Token, operatorsCheckFunc func(expressio
 			break
 		}
 
-		*expression = cleanExpression(*expression)
+		*expression = cleanExpression(expression)
 	}
 
 	return nil

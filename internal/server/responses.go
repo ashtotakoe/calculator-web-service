@@ -18,7 +18,7 @@ func writeToResponse(w http.ResponseWriter, responseBody interface{}, status int
 	w.Header().Set("Content-Type", "application/json")
 
 	encoder := json.NewEncoder(w)
-	err := encoder.Encode(&responseBody)
+	err := encoder.Encode(responseBody)
 
 	if err != nil {
 		return err

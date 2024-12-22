@@ -13,14 +13,14 @@ const (
 	invalidExpressionError = "Expression is not valid"
 )
 
-var detailedValidationResponse = false
+var isDetailedValidationResponse = false
 
 func handleExpression(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	defer func() {
 		if err := recover(); err != nil {
 			log.Println(err)
-			writeToResponse(w, ErrorResponse{internalServerError}, http.StatusInternalServerError)
+			writeToResponse(w, &ErrorResponse{internalServerError}, http.StatusInternalServerError)
 		}
 	}()
 
@@ -32,7 +32,7 @@ func handleExpression(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("body decoder: ", err)
-		writeToResponse(w, ErrorResponse{invalidExpressionError}, http.StatusUnprocessableEntity)
+		writeToResponse(w, &ErrorResponse{invalidExpressionError}, http.StatusUnprocessableEntity)
 
 		return
 	}
@@ -42,21 +42,21 @@ func handleExpression(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("calculator: ", err)
 
-		if detailedValidationResponse {
-			writeToResponse(w, ErrorResponse{err.Error()}, http.StatusUnprocessableEntity)
+		if isDetailedValidationResponse {
+			writeToResponse(w, &ErrorResponse{err.Error()}, http.StatusUnprocessableEntity)
 			return
 		}
 
-		writeToResponse(w, ErrorResponse{invalidExpressionError}, http.StatusUnprocessableEntity)
+		writeToResponse(w, &ErrorResponse{invalidExpressionError}, http.StatusUnprocessableEntity)
 		return
 	}
 
-	writeToResponse(w, ResultResponse{result.TextValue}, http.StatusOK)
+	writeToResponse(w, &ResultResponse{result.TextValue}, http.StatusOK)
 
 }
 
-func NewServer(runWithDetailedValidation bool) *http.ServeMux {
-	detailedValidationResponse = runWithDetailedValidation
+func NewServer(dV bool) *http.ServeMux {
+	isDetailedValidationResponse = dV
 
 	mux := http.NewServeMux()
 
