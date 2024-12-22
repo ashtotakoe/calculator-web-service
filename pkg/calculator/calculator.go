@@ -131,7 +131,14 @@ func solveUnaryOperators(expression *[]Token) *[]Token {
 		}
 
 		if token.textValue == "-" {
-			(*expression)[i+1].numberValue = -(*expression)[i+1].numberValue
+			newVal := -(*expression)[i+1].numberValue
+
+			(*expression)[i+1] = Token{
+				tokenType:      "number",
+				hasNumberValue: true,
+				textValue:      strconv.FormatFloat(newVal, 'f', -1, 64),
+				numberValue:    newVal,
+			}
 		}
 
 		(*expression)[i] = newEmptyToken()

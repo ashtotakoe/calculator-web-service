@@ -5,11 +5,11 @@ import (
 	"net/http"
 )
 
-type ResultResponse struct {
+type ResultBody struct {
 	Result string `json:"result"`
 }
 
-type ErrorResponse struct {
+type ErrorBody struct {
 	Error string `json:"error"`
 }
 

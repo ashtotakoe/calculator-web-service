@@ -66,3 +66,12 @@ curl --location 'http://localhost:[порт]/api/v1/calculate' \
   "error": "Internal server error"
 }
 ```
+
+
+### 4. Запуск тестов
+
+```bash
+cd ./test
+go test
+```
+

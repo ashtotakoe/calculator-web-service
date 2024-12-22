@@ -20,7 +20,7 @@ func handleExpression(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		if err := recover(); err != nil {
 			log.Println(err)
-			writeToResponse(w, &ErrorResponse{internalServerError}, http.StatusInternalServerError)
+			writeToResponse(w, &ErrorBody{internalServerError}, http.StatusInternalServerError)
 		}
 	}()
 
@@ -32,7 +32,7 @@ func handleExpression(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("body decoder: ", err)
-		writeToResponse(w, &ErrorResponse{invalidExpressionError}, http.StatusUnprocessableEntity)
+		writeToResponse(w, &ErrorBody{invalidExpressionError}, http.StatusUnprocessableEntity)
 
 		return
 	}
@@ -43,15 +43,15 @@ func handleExpression(w http.ResponseWriter, r *http.Request) {
 		log.Println("calculator: ", err)
 
 		if isDetailedValidationResponse {
-			writeToResponse(w, &ErrorResponse{err.Error()}, http.StatusUnprocessableEntity)
+			writeToResponse(w, &ErrorBody{err.Error()}, http.StatusUnprocessableEntity)
 			return
 		}
 
-		writeToResponse(w, &ErrorResponse{invalidExpressionError}, http.StatusUnprocessableEntity)
+		writeToResponse(w, &ErrorBody{invalidExpressionError}, http.StatusUnprocessableEntity)
 		return
 	}
 
-	writeToResponse(w, &ResultResponse{result.TextValue}, http.StatusOK)
+	writeToResponse(w, &ResultBody{result.TextValue}, http.StatusOK)
 
 }
 
