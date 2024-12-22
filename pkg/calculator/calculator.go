@@ -87,32 +87,7 @@ func evaluateExpression(expression []Token) (Token, error) {
 		return newEmptyToken(), err
 	}
 
-	for i := len(expression) - 1; i >= 0; i-- {
-		token := expression[i]
-
-		if token.textValue != "+" && token.textValue != "-" {
-			continue
-		}
-
-		// check if there is a number after the operator, but not before to handle (+90) or (-5) correctly
-		if i >= len(expression)-1 || expression[i+1].tokenType != "number" {
-			continue
-		}
-
-		// we shall the situations like (1 + 2) for now
-		if i != 0 && expression[i-1].tokenType == "number" {
-			continue
-		}
-
-		if token.textValue == "-" {
-			expression[i+1].numberValue = -expression[i+1].numberValue
-		}
-
-		expression[i] = newEmptyToken()
-
-	}
-
-	expression = cleanExpression(expression)
+	expression = solveUnaryOperators(expression)
 
 	err = scanForMathOperators(&expression, func(expression []Token) bool {
 		return containsTokensValue(expression, "*") || containsTokensValue(expression, "/")
@@ -135,6 +110,35 @@ func evaluateExpression(expression []Token) (Token, error) {
 	}
 
 	return newEmptyToken(), errors.New("something is wrong with expression")
+}
+
+func solveUnaryOperators(expression []Token) []Token {
+	for i := len(expression) - 1; i >= 0; i-- {
+		token := expression[i]
+
+		if token.textValue != "+" && token.textValue != "-" {
+			continue
+		}
+
+		// check if there is a number after the operator, but not before to handle (+90) or (-5) correctly
+		if i >= len(expression)-1 || expression[i+1].tokenType != "number" {
+			continue
+		}
+
+		// we shall skip the situations like (1 + 2) for now
+		if i != 0 && expression[i-1].tokenType == "number" {
+			continue
+		}
+
+		if token.textValue == "-" {
+			expression[i+1].numberValue = -expression[i+1].numberValue
+		}
+
+		expression[i] = newEmptyToken()
+
+	}
+
+	return cleanExpression(expression)
 }
 
 func openExpressionBrackets(expression *[]Token) error {

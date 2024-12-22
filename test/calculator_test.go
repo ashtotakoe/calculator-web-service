@@ -1,6 +1,7 @@
 package calculator
 
 import (
+	"calculator/pkg/calculator"
 	"testing"
 )
 
@@ -35,10 +36,14 @@ func TestCalc(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.expression, func(t *testing.T) {
-			result, err := Calc(testCase.expression)
+			result, err := calculator.Calc(testCase.expression)
+
 			if err != nil {
 				t.Errorf("Calc(%s) error: %v", testCase.expression, err)
-			} else if result != testCase.expected {
+				return
+			}
+
+			if result != testCase.expected {
 				t.Errorf("Calc(%s) = %v, want %v", testCase.expression, result, testCase.expected)
 			}
 		})
@@ -67,7 +72,7 @@ func TestCalcErrors(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase, func(t *testing.T) {
-			_, err := Calc(testCase)
+			_, err := calculator.Calc(testCase)
 			if err == nil {
 				t.Errorf("Calc(%s) error is not nil", testCase)
 			}
