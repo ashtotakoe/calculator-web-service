@@ -6,7 +6,7 @@
 
 ```bash
 # Клонируем репозиторий
-git clone https://github.com/ashtotakoe/calculator-web-service
+git clone https://github.com/ashtotakoe/calculator-web-service.git
 cd calculator-web-service
 # Запуск сервера
 go run cmd/main.go [порт]
@@ -23,7 +23,7 @@ go run cmd/main.go [порт]
 ### 1. Успешное вычисление выражения
 
 ```bash
-curl --location 'http://localhost:8080/api/v1/calculate' \
+curl --location 'http://localhost:[порт]/api/v1/calculate' \
 --header 'Content-Type: application/json' \
 --data '{
     "expression": "2+2*2"
@@ -41,7 +41,7 @@ curl --location 'http://localhost:8080/api/v1/calculate' \
 ### 2. Некорректное выражение
 
 ```bash
-curl --location 'http://localhost:8080/api/v1/calculate' \
+curl --location 'http://localhost:[порт]/api/v1/calculate' \
 --header 'Content-Type: application/json' \
 --data '{
     "expression": "2+2*a"
@@ -52,9 +52,10 @@ curl --location 'http://localhost:8080/api/v1/calculate' \
 
 ```json
 {
-  "error": "Expression is not valid" // или более детальная ошибка (флаг detailed-validation)
+  "error": "Expression is not valid" 
 }
 ```
+Также может прийти более детальная ошибка если сервер запущен с флагом **detailed-validation**
 
 ### 3. Также может вернуться internal server error
 
