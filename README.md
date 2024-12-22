@@ -9,13 +9,13 @@
 git clone https://github.com/ashtotakoe/calculator-web-service.git
 cd calculator-web-service
 # Запуск сервера
-go run cmd/main.go [порт]
+go run ./cmd/main.go [порт]
 ```
 
 Для отображения детальных ошибок, нужно после порта добавить флаг **detailed-validation**
 
 ```bash
-  go run cmd/main.go [порт] detailed-validation
+  go run ./cmd/main.go [порт] detailed-validation
 ```
 
 ## Примеры использования
