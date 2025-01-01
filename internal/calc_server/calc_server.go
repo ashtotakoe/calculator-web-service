@@ -1,7 +1,6 @@
-package server
+package calc_server
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -13,7 +12,11 @@ const (
 	invalidExpressionError = "Expression is not valid"
 )
 
-var isDetailedValidationResponse = false
+type ServerConf struct {
+	DetailedErrors bool
+}
+
+var serverConfig ServerConf
 
 func handleExpression(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
@@ -24,11 +27,7 @@ func handleExpression(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	req := Request{}
-
-	decoder := json.NewDecoder(r.Body)
-
-	err := decoder.Decode(&req)
+	req, err := extractCalcRequest(r)
 
 	if err != nil {
 		log.Println("body decoder: ", err)
@@ -42,7 +41,7 @@ func handleExpression(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("calculator: ", err)
 
-		if isDetailedValidationResponse {
+		if serverConfig.DetailedErrors {
 			writeToResponse(w, &ErrorBody{err.Error()}, http.StatusUnprocessableEntity)
 			return
 		}
@@ -55,8 +54,9 @@ func handleExpression(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func NewServer(dV bool) *http.ServeMux {
-	isDetailedValidationResponse = dV
+func NewServer(config ServerConf) *http.ServeMux {
+
+	serverConfig = config
 
 	mux := http.NewServeMux()
 

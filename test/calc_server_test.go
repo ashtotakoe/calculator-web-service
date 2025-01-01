@@ -8,13 +8,15 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/ashtotakoe/calculator-web-service/internal/server"
+	"github.com/ashtotakoe/calculator-web-service/internal/calc_server"
 )
 
 const expressionHandlerURL = "/api/v1/calculate"
 
 func TestServer(t *testing.T) {
-	s := httptest.NewServer(server.NewServer(false))
+	s := httptest.NewServer(calc_server.NewServer(calc_server.ServerConf{
+		DetailedErrors: false,
+	}))
 	defer s.Close()
 
 	url := s.URL
@@ -29,7 +31,7 @@ func TestServer(t *testing.T) {
 				return
 			}
 
-			parsedBody := &server.ResultBody{}
+			parsedBody := &calc_server.ResultBody{}
 
 			decoder := json.NewDecoder(response.Body)
 			err := decoder.Decode(parsedBody)
@@ -62,7 +64,7 @@ func TestServer(t *testing.T) {
 				return
 			}
 
-			parsedBody := &server.ResultBody{}
+			parsedBody := &calc_server.ResultBody{}
 
 			decoder := json.NewDecoder(response.Body)
 			err := decoder.Decode(parsedBody)
@@ -77,7 +79,7 @@ func TestServer(t *testing.T) {
 }
 
 func sendRequest(url, expression string) *http.Response {
-	reqBody := &server.Request{
+	reqBody := &calc_server.CalcRequest{
 		Expression: expression,
 	}
 	reqBodyBytes, _ := json.Marshal(reqBody)

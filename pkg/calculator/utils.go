@@ -1,17 +1,8 @@
 package calculator
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
 	"strings"
 )
-
-func clear() {
-	cmd := exec.Command("clear")
-	cmd.Stdout = os.Stdout
-	cmd.Run()
-}
 
 func cleanExpression(expression *[]Token) []Token {
 	res := make([]Token, 0, len(*expression))
@@ -64,29 +55,4 @@ func eraseFromSlice(slice []Token) []Token {
 	}
 
 	return slice
-}
-
-func printArr(arr []Token) {
-	fmt.Print("\n\n")
-
-	for _, token := range arr {
-		display := token.textValue
-
-		if token.tokenType == emptyTokenType {
-			display = " "
-		}
-
-		fmt.Print("  ", display, "  ")
-	}
-
-	fmt.Print("\n\n")
-
-	for i := range arr {
-
-		fmt.Print("  ", i, "  ")
-
-	}
-
-	fmt.Print("\n\n")
-
 }

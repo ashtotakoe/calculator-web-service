@@ -1,4 +1,4 @@
-package server
+package calc_server
 
 import (
 	"encoding/json"
