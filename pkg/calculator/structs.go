@@ -1,7 +1,7 @@
 package calculator
 
 type Token struct {
-	tokenType      string
+	tokenType      TokenType
 	textValue      string
 	hasNumberValue bool
 	numberValue    float64

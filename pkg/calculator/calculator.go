@@ -34,7 +34,6 @@ func tokenize(expression string) (*[]Token, error) {
 			if tempStorage != "" {
 				textTokens = append(textTokens, tempStorage+elem)
 			} else {
-
 				textTokens = append(textTokens, elem)
 			}
 
@@ -52,7 +51,7 @@ func tokenize(expression string) (*[]Token, error) {
 
 		if isOperator {
 			parsedTokens = append(parsedTokens, Token{
-				tokenType:      "operator",
+				tokenType:      operationTokenType,
 				textValue:      token,
 				hasNumberValue: false,
 				numberValue:    0,
@@ -69,7 +68,7 @@ func tokenize(expression string) (*[]Token, error) {
 		}
 
 		parsedTokens = append(parsedTokens, Token{
-			tokenType:      "number",
+			tokenType:      numberTokenType,
 			textValue:      token,
 			hasNumberValue: true,
 			numberValue:    numberValue,
@@ -121,12 +120,12 @@ func solveUnaryOperators(expression *[]Token) *[]Token {
 		}
 
 		// check if there is a number after the operator, but not before to handle (+90) or (-5) correctly
-		if i >= len(*expression)-1 || (*expression)[i+1].tokenType != "number" {
+		if i >= len(*expression)-1 || (*expression)[i+1].tokenType != numberTokenType {
 			continue
 		}
 
 		// we shall skip the situations like (1 + 2) for now
-		if i != 0 && (*expression)[i-1].tokenType == "number" {
+		if i != 0 && (*expression)[i-1].tokenType == numberTokenType {
 			continue
 		}
 
@@ -134,7 +133,7 @@ func solveUnaryOperators(expression *[]Token) *[]Token {
 			newVal := -(*expression)[i+1].numberValue
 
 			(*expression)[i+1] = Token{
-				tokenType:      "number",
+				tokenType:      numberTokenType,
 				hasNumberValue: true,
 				textValue:      strconv.FormatFloat(newVal, 'f', -1, 64),
 				numberValue:    newVal,
@@ -155,7 +154,7 @@ func openExpressionBrackets(expression *[]Token) error {
 	isOpeningBracketFound := false
 
 	for index, token := range *expression {
-		if token.tokenType != "operator" {
+		if token.tokenType != operationTokenType {
 			continue
 		}
 
@@ -221,7 +220,7 @@ func scanForMathOperators(expression *[]Token, operatorsCheckFunc func(expressio
 
 			operand1, operand2 := (*expression)[index-1], (*expression)[index+1]
 
-			if operand1.tokenType != "number" || operand2.tokenType != "number" || operator.tokenType != "operator" {
+			if operand1.tokenType != numberTokenType || operand2.tokenType != numberTokenType || operator.tokenType != operationTokenType {
 				return fmt.Errorf("something is wrong with expression %s %s %s", operand1.textValue, operator.textValue, operand2.textValue)
 			}
 
@@ -278,7 +277,7 @@ func conductArithmeticOperation(val1, val2 float64, operator string) (Token, err
 	}
 
 	return Token{
-		tokenType:      "number",
+		tokenType:      numberTokenType,
 		hasNumberValue: true,
 		textValue:      strconv.FormatFloat(res, 'f', -1, 64),
 		numberValue:    res,

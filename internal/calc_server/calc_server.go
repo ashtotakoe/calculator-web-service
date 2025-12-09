@@ -12,11 +12,11 @@ const (
 	invalidExpressionError = "Expression is not valid"
 )
 
-type ServerConf struct {
+type ServerConfig struct {
 	DetailedErrors bool
 }
 
-var serverConfig ServerConf
+var serverConfig ServerConfig
 
 func handleExpression(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
@@ -54,13 +54,13 @@ func handleExpression(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func NewServer(config ServerConf) *http.ServeMux {
+func NewServer(config ServerConfig) *http.ServeMux {
 
 	serverConfig = config
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/api/v1/calculate", handleExpression)
+	mux.HandleFunc("POST /api/v1/calculate", handleExpression)
 
 	return mux
 }

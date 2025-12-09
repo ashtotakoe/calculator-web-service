@@ -1,6 +1,7 @@
 package calculator
 
 import (
+	"slices"
 	"strings"
 )
 
@@ -19,17 +20,7 @@ func cleanExpression(expression *[]Token) []Token {
 
 func containsString(slice []string, item string) bool {
 
-	for _, value := range slice {
-
-		if value == item {
-
-			return true
-
-		}
-
-	}
-
-	return false
+	return slices.Contains(slice, item)
 }
 
 func containsTokensValue(tokens *[]Token, value string) bool {
@@ -43,10 +34,7 @@ func containsTokensValue(tokens *[]Token, value string) bool {
 
 func formatExpression(expression string) string {
 
-	expression = strings.ReplaceAll(expression, " ", "")
-	expression = strings.ReplaceAll(expression, ",", ".")
-
-	return expression
+	return strings.ReplaceAll(strings.ReplaceAll(expression, " ", ""), ",", ".")
 }
 
 func eraseFromSlice(slice []Token) []Token {

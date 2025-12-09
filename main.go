@@ -19,7 +19,7 @@ func main() {
 	}
 
 	s := calc_server.NewServer(
-		calc_server.ServerConf{
+		calc_server.ServerConfig{
 			DetailedErrors: runWithDetailedErrors,
 		})
 

@@ -12,9 +12,7 @@ type CalcRequest struct {
 func extractCalcRequest(r *http.Request) (*CalcRequest, error) {
 	req := &CalcRequest{}
 
-	decoder := json.NewDecoder(r.Body)
-
-	err := decoder.Decode(req)
+	err := json.NewDecoder(r.Body).Decode(req)
 
 	if err != nil {
 		return nil, err

@@ -14,7 +14,7 @@ import (
 const expressionHandlerURL = "/api/v1/calculate"
 
 func TestServer(t *testing.T) {
-	s := httptest.NewServer(calc_server.NewServer(calc_server.ServerConf{
+	s := httptest.NewServer(calc_server.NewServer(calc_server.ServerConfig{
 		DetailedErrors: false,
 	}))
 	defer s.Close()
